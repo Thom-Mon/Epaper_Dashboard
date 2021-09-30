@@ -1,14 +1,10 @@
 from urllib.request import urlopen
 import re
-import requests #necessary wg. https (vielleicht 2 Versionen machen je nach python-Version)
+import requests
 
 def weather_Report_DWD():
     link = 'https://morgenwirdes.de/wetter.php?id=567'
     wholeHtmlAsString = requests.get(link).text
-    #print(r)
-    #f = urlopen(link)
-    #wholeHtml = f.read()
-    #wholeHtmlAsString = str(wholeHtml, 'utf-8')
 
     SearchpatternMax = "\"36\" fill=\"red\">"
     SearchpatternNight = "\"36\" fill=\"blue\">"
@@ -34,17 +30,12 @@ def weather_Report_DWD():
         
         data = weatherDataStorage[StorageNames[index]]=[]
         
-        if StorageNames[index] == 'rainCount':
-            startLimit = 0
-        else:
-            startLimit = 0
-        
         while IndexOfSearchpattern != -1:
             IndexOfSearchpattern = wholeHtmlAsString.find(searchpattern, IndexOfNewSearch)
             IndexOfSearchpatternEnd = wholeHtmlAsString.find(SearchpatternEnd, IndexOfSearchpattern+len(searchpattern))
             
             if IndexOfSearchpattern != 0 and IndexOfSearchpattern != -1:
-                data.append(wholeHtmlAsString[IndexOfSearchpattern+len(searchpattern)+startLimit:IndexOfSearchpatternEnd])
+                data.append(wholeHtmlAsString[IndexOfSearchpattern+len(searchpattern):IndexOfSearchpatternEnd])
             IndexOfNewSearch = IndexOfSearchpattern+len(searchpattern)
         
         IndexOfSearchpattern = 0
@@ -75,21 +66,4 @@ def weather_Report_DWD():
         weatherDataStorage['rainCount'].append(wholeHtmlAsString[index:endText])
     
     return weatherDataStorage
-
-
-
-#allMaxTemperatures = weather_Report_DWD()   #Namen noch ändern TODO:
-
-
-#counter = 0
-#for index in allMaxTemperatures['maxTemp']:
-#    print (index + "___" + allMaxTemperatures['nightTemp'][counter] + "___" + allMaxTemperatures['rainCount'][counter]) 
-#    
-#    counter += 1
-    
-#for index in allMaxTemperatures['rainCount']:
- #   print (index)
-    
-#for index in allMaxTemperatures['rainCount']:
- #   print (index) 
 

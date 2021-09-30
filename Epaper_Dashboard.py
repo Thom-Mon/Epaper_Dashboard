@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
+
+#README ON https://github.com/Thom-Mon/Epaper_Dashboard.git
+
 import sys
 import os
 picdir = '/home/pi/bcm2835-1.60/e-Paper/RaspberryPi_JetsonNano/python/pic'
@@ -35,31 +38,16 @@ DataMaxTempPosX = DataCurrTempPosX+56
 DataRainPosX = DataMaxTempPosX+66
 
 
-#Get Highwayreports for given Entry and Exit...Syntax => GetReportsOnHighway(HighwayName, Entry, Exit)
+#Get Highwayreports for given Entry and Exit...Syntax => GetReportsOnHighway(HighwayName, Entry, Exit) -> 1 wenn Stau, 0 wenn alles frei
 
 jam = GetReportsOnHighway("A4", "Kreuz Erfurt", "Magdala")
 
-"""
-#Getting Temp and Rain from Website #################################################################
+#Get WeatherData from newWeatherReport (DWD -> morgenwirdes.de)
+weatherData  = weather_Report_DWD()
+maxTempToday = weatherData['maxTemp'][0]
+rainToday    = weatherData['rainCount'][0]
 
-Refactored to the weatherReport-Import
 
-Variables:
-
-MaxTemp => gives maximum Temperature of the Day
-CurrentTemp => gives current Temperature reeadings from weatherstation in Jena
-numberextract_rain => gives probability of rain in Jena
-
-#Getting Messages from Tageschau Atom######################################################################
-
-Variables:
-
-Message_Board(index on Tagesschau 'https://www.tagesschau.de/xml/atom/'
-
-Example:
-Message_Board(0)
-#################################################################################################
-"""
 logging.basicConfig(level=logging.DEBUG)
 
 try:
@@ -82,10 +70,6 @@ try:
     font60 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 60)
     font14 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 13)
 
-    #get newWeatherData
-    weatherData = weather_Report_DWD()
-
-
     # All Drawing Content
     logging.info("Drawing Dashboard Content")
     HBlackimage = Image.new('1', (epd.width, epd.height), 255)  # 298*126
@@ -95,14 +79,15 @@ try:
 
     drawblack.text((Left_Border, 0), u' {}'.format(now), font = font60, fill = 0)
     drawblack.text((Left_Border, 65), 'Datum: {}'.format(datum), font = font24, fill = 0)
+
     drawblack.text((Left_Border, 110), ' {}'.format(Message_Board(0)), font = font14, fill = 0)
     drawblack.text((Left_Border, 130), ' {}'.format(Message_Board(1)), font = font14, fill = 0)
     drawblack.text((Left_Border, 150), ' {}'.format(Message_Board(2)), font = font14, fill = 0)
 
-    drawblack.text((355, DataNumberY), ' {}'.format(weatherData['rainCount'][0]), font = font18, fill = 0)
-    drawblack.text((289, DataNumberY), ' {}°C'.format(weatherData['maxTemp'][0]), font = font18, fill = 0)
+    drawblack.text((355, DataNumberY), ' {}'.format(rainToday), font = font18, fill = 0)
+    drawblack.text((289, DataNumberY), ' {}°C'.format(maxTempToday), font = font18, fill = 0)
     drawblack.text((233, DataNumberY), ' {}°C'.format(CurrentTemp), font = font18, fill = 0)
-    
+
     drawry.text((Left_Border, 170), ' {}'.format(jam), font = font14, fill = 0)
     drawblack.line((Left_Border, 100, 225, 100), fill = 0)
     newimage = Image.open('/home/pi/bcm2835-1.60/e-Paper/RaspberryPi_JetsonNano/python/pic/40x30_rain.bmp')
