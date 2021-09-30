@@ -18,6 +18,7 @@ import datetime
 from trafficReport import *
 from weatherReport import *
 from messageReport import *
+from newWeatherReport import *
 
 #Position Variables for Drawing#######################################################################
 # CHANGE POSITION OF DRAWINGS HERE
@@ -81,20 +82,27 @@ try:
     font60 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 60)
     font14 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 13)
 
+    #get newWeatherData
+    weatherData = weather_Report_DWD()
+
+
     # All Drawing Content
     logging.info("Drawing Dashboard Content")
     HBlackimage = Image.new('1', (epd.width, epd.height), 255)  # 298*126
     HRYimage = Image.new('1', (epd.width, epd.height), 255)  # 298*126  ryimage: red or yellow image
     drawblack = ImageDraw.Draw(HBlackimage)
     drawry = ImageDraw.Draw(HRYimage)
+
+    drawblack.text((Left_Border, 0), u' {}'.format(now), font = font60, fill = 0)
     drawblack.text((Left_Border, 65), 'Datum: {}'.format(datum), font = font24, fill = 0)
     drawblack.text((Left_Border, 110), ' {}'.format(Message_Board(0)), font = font14, fill = 0)
     drawblack.text((Left_Border, 130), ' {}'.format(Message_Board(1)), font = font14, fill = 0)
     drawblack.text((Left_Border, 150), ' {}'.format(Message_Board(2)), font = font14, fill = 0)
-    drawblack.text((Left_Border, 0), u' {}'.format(now), font = font60, fill = 0)
-    drawblack.text((355, DataNumberY), ' {}%'.format(numberextract_rain), font = font18, fill = 0)
-    drawblack.text((289, DataNumberY), ' {}°C'.format(MaxTemp), font = font18, fill = 0)
+
+    drawblack.text((355, DataNumberY), ' {}'.format(weatherData['rainCount'][0]), font = font18, fill = 0)
+    drawblack.text((289, DataNumberY), ' {}°C'.format(weatherData['maxTemp'][0]), font = font18, fill = 0)
     drawblack.text((233, DataNumberY), ' {}°C'.format(CurrentTemp), font = font18, fill = 0)
+    
     drawry.text((Left_Border, 170), ' {}'.format(jam), font = font14, fill = 0)
     drawblack.line((Left_Border, 100, 225, 100), fill = 0)
     newimage = Image.open('/home/pi/bcm2835-1.60/e-Paper/RaspberryPi_JetsonNano/python/pic/40x30_rain.bmp')
